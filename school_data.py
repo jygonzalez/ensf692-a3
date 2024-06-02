@@ -33,8 +33,8 @@ enrollment_data_array = np.array(enrollment_data).reshape((10, 20, 3))
 
 # New array, set NaN values to Zero.
 
-mask_nan = np.isnan(enrollment_data_array)
-enrollment_data_array[mask_nan] = 0
+mask = np.isnan(enrollment_data_array)
+enrollment_data_array[mask] = 0
 
 # Declare any global variables needed to store the data here
 school_dict = {
@@ -49,6 +49,7 @@ school_dict = {
     "9825": "James Fowler High School",
     "9826": "Ernest Manning High School",
     "9829": "William Aberhart High School",
+    "9830": "National Sport School",
     "9836": "Henry Wise Wood High School",
     "9847": "Bowness High School",
     "9850": "Lord Beaverbrook High School",
@@ -65,7 +66,7 @@ class School:
     def __init__(self, name, code):
         self.name = name
         self.code = code
-        self.index = list(school_dict.keys()).index(code) + 1
+        self.index = list(school_dict.keys()).index(code)
     
     def enrollments(self, data_array):
         return data_array[:, self.index,:]
@@ -83,6 +84,10 @@ class School:
         enrollments = self.enrollments(data_array)
         year_index = {2013: 0, 2014: 1, 2015: 2, 2016: 3, 2017: 4, 2018: 5, 2019: 6, 2020: 7, 2021: 8, 2022: 9}[year]
         return enrollments[year_index]
+
+def mask_zeroes(data_array):
+    mask = (data_array == 0)
+    return data_array[~mask]
 
 
 def main():
@@ -114,9 +119,10 @@ def main():
     grade_11_enrollments = school.enrollments_by_grade(enrollment_data_array, 11)
     grade_12_enrollments = school.enrollments_by_grade(enrollment_data_array, 12)
 
-    print(f"Mean enrollment for grade 10: {np.floor(np.mean(grade_10_enrollments)).astype(int)}")
-    print(f"Mean enrollment for grade 11: {np.floor(np.mean(grade_11_enrollments)).astype(int)}")
-    print(f"Mean enrollment for grade 12: {np.floor(np.mean(grade_12_enrollments)).astype(int)}")
+    # TODO: ask if i should exclude values equal to zero from the mean calculation here 
+    print(f"Mean enrollment for grade 10: {np.floor(np.mean(mask_zeroes(grade_10_enrollments))).astype(int)}")
+    print(f"Mean enrollment for grade 11: {np.floor(np.mean(mask_zeroes(grade_11_enrollments))).astype(int)}")
+    print(f"Mean enrollment for grade 12: {np.floor(np.mean(mask_zeroes(grade_12_enrollments))).astype(int)}")
 
     highest_enrollment = max(np.max(grade_10_enrollments), np.max(grade_11_enrollments), np.max(grade_12_enrollments))
     print(f"Highest enrollment for a single grade: {np.floor(highest_enrollment).astype(int)}")
@@ -124,6 +130,7 @@ def main():
     lowest_enrollment = min(np.min(grade_10_enrollments), np.min(grade_11_enrollments), np.min(grade_12_enrollments))    
     print(f"Lowest enrollment for a single grade: {np.floor(lowest_enrollment).astype(int)}")
 
+    format
     yearly_totals = []
 
     for year in range(2013, 2023):
@@ -132,15 +139,18 @@ def main():
         print(f"Total enrollment for {year}: {np.floor(year_total).astype(int)}")
 
     enrollments_total = np.sum(school.enrollments(enrollment_data_array))
-    print(f"Total ten year enrollment (2): {np.floor(enrollments_total).astype(int)}")
+    print(f"Total ten year enrollment: {np.floor(enrollments_total).astype(int)}")
+    
+    # TODO: ask if i should exclude values equal to zero from the mean calculation here 
+    filtered_yearly_totals = [value for value in yearly_totals if value != 0]
+    print(f"Mean total enrollment over {len(yearly_totals)} years: {np.floor(np.mean(filtered_yearly_totals)).astype(int)}")
 
-    print(f"Mean total enrollment over {len(yearly_totals)} years: {np.floor(np.mean(yearly_totals)).astype(int)}")
-
+    # TODO: ask if i should exclude values equal to zero from the median calculation here
     all_enrollments = school.enrollments(enrollment_data_array) 
-    mask_500 = all_enrollments > 500
+    mask = all_enrollments > 500
     # Check if any values are greater than 500
-    if np.any(mask_500):       
-        filtered_values = all_enrollments[mask_500]
+    if np.any(mask):       
+        filtered_values = all_enrollments[mask]
         print(f"For all enrollments over 500, the median value was: {np.floor(np.median(filtered_values)).astype(int)}")
     else:
         print("No enrollments over 500.")
@@ -150,10 +160,8 @@ def main():
 
     print(f"Mean enrollment in 2013: {np.floor(np.mean(enrollment_data_array[0, :, :])).astype(int)}")
 
-    enrollments_in_2022_zeroes = enrollment_data_array[9, :, :]  
-    mask_zeroes = (enrollments_in_2022_zeroes == 0)
-    enrollments_in_2022 = enrollments_in_2022_zeroes[~mask_zeroes]
-    print(f"Mean enrollment in 2022: {np.floor(np.mean(enrollments_in_2022)).astype(int)}")
+    enrollments_in_2022 = enrollment_data_array[9, :, :] 
+    print(f"Mean enrollment in 2022: {np.floor(np.mean(mask_zeroes(enrollments_in_2022))).astype(int)}")
     
     grade_12_enrollments_in_2022 = enrollment_data_array[9, :, 2]
     print(f"Total graduating class of 2022: {np.floor(np.sum(grade_12_enrollments_in_2022)).astype(int)}")
