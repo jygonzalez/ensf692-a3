@@ -10,32 +10,31 @@
 import numpy as np
 from given_data import year_2013, year_2014, year_2015, year_2016, year_2017, year_2018, year_2019, year_2020, year_2021, year_2022
 
-# Clean data
-school12_grade10_years_2013_to_2020 = [year_2013.reshape(20, 3)[11][0], year_2014.reshape(20, 3)[11][0], year_2015.reshape(20, 3)[11][0], year_2016.reshape(20, 3)[11][0], year_2017.reshape(20, 3)[11][0], year_2018.reshape(20, 3)[11][0], year_2019.reshape(20, 3)[11][0], year_2020.reshape(20, 3)[11][0]]
-school12_grade11_years_2013_to_2020 = [year_2013.reshape(20, 3)[11][1], year_2014.reshape(20, 3)[11][1], year_2015.reshape(20, 3)[11][1], year_2016.reshape(20, 3)[11][1], year_2017.reshape(20, 3)[11][1], year_2018.reshape(20, 3)[11][1], year_2019.reshape(20, 3)[11][1], year_2020.reshape(20, 3)[11][1]]
-school12_grade12_years_2013_to_2020 = [year_2013.reshape(20, 3)[11][2], year_2014.reshape(20, 3)[11][2], year_2015.reshape(20, 3)[11][2], year_2016.reshape(20, 3)[11][2], year_2017.reshape(20, 3)[11][2], year_2018.reshape(20, 3)[11][2], year_2019.reshape(20, 3)[11][2], year_2020.reshape(20, 3)[11][2]]
+# Define array for enrollment data: Create a list containing year arrays, create an array using the list and reshape it
+enrollment_data = [year_2013, year_2014, year_2015, year_2016, year_2017, year_2018, year_2019, year_2020, year_2021, year_2022]
+enrollment_data_array = np.array(enrollment_data).reshape((10, 20, 3))
 
-import math
+# TODO: Ask about this
+# # Clean data (Analysis on how this was done can be found in school_data.pdf)
+# # Extract data for each grade from 2013 to 2020 (indices 0 to 7)
+# grade_10_data = enrollment_data_array[0:8, 11, 0]
+# grade_11_data = enrollment_data_array[0:8, 11, 1]
+# grade_12_data = enrollment_data_array[0:8, 11, 2]
+# # Compute replacement values
+# grade_10_replacement = np.floor(np.mean(grade_10_data)).astype(int)
+# grade_11_replacement = np.floor(np.mean(grade_11_data)).astype(int)
+# grade_12_replacement = np.floor(np.mean(grade_12_data)).astype(int)
+# # Create a copy of the original array to modify
+# enrollment_data_clean_array = np.copy(enrollment_data_array)
+# # Replace NaN values at the specified locations with the computed replacement values using slicing
+# enrollment_data_clean_array[8:10, 11, 0] = grade_10_replacement
+# enrollment_data_clean_array[8:10, 11, 1] = grade_11_replacement
+# enrollment_data_clean_array[8:10, 11, 2] = grade_12_replacement
 
-school12_mean_grade10 = math.floor(np.mean(school12_grade10_years_2013_to_2020))
-school12_mean_grade11 = math.floor(np.mean(school12_grade11_years_2013_to_2020))
-school12_mean_grade12 = math.floor(np.mean(school12_grade12_years_2013_to_2020))
+# New array, set NaN values to Zero.
 
-clean_2D_2021 = year_2021.reshape(20, 3)
-
-clean_2D_2021[11][0] = school12_mean_grade10
-clean_2D_2021[11][1] = school12_mean_grade11
-clean_2D_2021[11][2] = school12_mean_grade12
-
-year_2021_clean = clean_2D_2021.reshape(60)
-
-clean_2D_2022 = year_2022.reshape(20, 3)
-
-clean_2D_2022[11][0] = school12_mean_grade10
-clean_2D_2022[11][1] = school12_mean_grade11
-clean_2D_2022[11][2] = school12_mean_grade12
-
-year_2022_clean = clean_2D_2022.reshape(60)
+mask_nan = np.isnan(enrollment_data_array)
+enrollment_data_array[mask_nan] = 0
 
 # Declare any global variables needed to store the data here
 school_dict = {
@@ -69,41 +68,27 @@ class School:
         self.index = list(school_dict.keys()).index(code) + 1
     
     def enrollments(self, data_array):
-        enrollments = []
-        for i in range(data_array.shape[0]):
-            enrollments.append(data_array[i][self.index])
-        return enrollments
+        return data_array[:, self.index,:]
     
     def enrollments_by_grade(self, data_array, grade): 
         if grade not in [10, 11, 12]:
             raise ValueError("Grade must be one of 10, 11, or 12.")
-
         enrollments = self.enrollments(data_array)
         grade_index = {10: 0, 11: 1, 12: 2}[grade]
-        grade_enrollments = [enrollment[grade_index] for enrollment in enrollments]
-        return grade_enrollments
+        return enrollments[:, grade_index]
     
     def enrollments_by_year(self, data_array, year): 
         if year not in [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]:
-            raise ValueError("Year must be in the range 2013 to 2022.")
-        
+            raise ValueError("Year must be in the range 2013 to 2022.")      
         enrollments = self.enrollments(data_array)
         year_index = {2013: 0, 2014: 1, 2015: 2, 2016: 3, 2017: 4, 2018: 5, 2019: 6, 2020: 7, 2021: 8, 2022: 9}[year]
-
-        year_enrollments = enrollments[year_index]
-        return year_enrollments
+        return enrollments[year_index]
 
 
 def main():
     print("ENSF 692 School Enrollment Statistics")
 
     # Print Stage 1 requirements here
-    enrollment_data = [year_2013, year_2014, year_2015, year_2016, year_2017, year_2018, year_2019, year_2020, year_2021, year_2022]
-    enrollment_data_array = np.array(enrollment_data).reshape((10, 20, 3))
-
-    enrollment_clean_data = [year_2013, year_2014, year_2015, year_2016, year_2017, year_2018, year_2019, year_2020, year_2021_clean, year_2022_clean]
-    enrollment_clean_data_array = np.array(enrollment_clean_data).reshape((10, 20, 3))
-
     print("Shape of full data array: ", enrollment_data_array.shape)
     print("Dimensions of full data array: ", enrollment_data_array.ndim)    
 
@@ -133,50 +118,55 @@ def main():
     print(f"Mean enrollment for grade 11: {np.floor(np.mean(grade_11_enrollments)).astype(int)}")
     print(f"Mean enrollment for grade 12: {np.floor(np.mean(grade_12_enrollments)).astype(int)}")
 
-    max_enrollments = [max(grade_10_enrollments), max(grade_11_enrollments), max(grade_12_enrollments)]
-    
-    print(f"Highest enrollment for a single grade: {np.floor(max(max_enrollments)).astype(int)}")
+    highest_enrollment = max(np.max(grade_10_enrollments), np.max(grade_11_enrollments), np.max(grade_12_enrollments))
+    print(f"Highest enrollment for a single grade: {np.floor(highest_enrollment).astype(int)}")
 
-    min_enrollments = [min(grade_10_enrollments), min(grade_11_enrollments), min(grade_12_enrollments)]
-    
-    print(f"Lowest enrollment for a single grade: {np.floor(min(min_enrollments)).astype(int)}")
+    lowest_enrollment = min(np.min(grade_10_enrollments), np.min(grade_11_enrollments), np.min(grade_12_enrollments))    
+    print(f"Lowest enrollment for a single grade: {np.floor(lowest_enrollment).astype(int)}")
 
     yearly_totals = []
-    grand_total = 0
 
     for year in range(2013, 2023):
-        year_total = sum(school.enrollments_by_year(enrollment_data_array, year))
-        grand_total = grand_total + year_total
+        year_total = np.sum(school.enrollments_by_year(enrollment_data_array, year))
         yearly_totals.append(year_total)
         print(f"Total enrollment for {year}: {np.floor(year_total).astype(int)}")
 
-    print(f"Total ten year enrollment: {np.floor(grand_total).astype(int)}")
+    enrollments_total = np.sum(school.enrollments(enrollment_data_array))
+    print(f"Total ten year enrollment (2): {np.floor(enrollments_total).astype(int)}")
 
     print(f"Mean total enrollment over {len(yearly_totals)} years: {np.floor(np.mean(yearly_totals)).astype(int)}")
 
-    all_enrollments = school.enrollments(enrollment_data_array) # list of 10 arrays each with 3 indexes
-    all_enrollments = np.array(all_enrollments) # convert to array and flatten it to 1D
+    all_enrollments = school.enrollments(enrollment_data_array) 
+    mask_500 = all_enrollments > 500
     # Check if any values are greater than 500
-    if np.any(all_enrollments > 500):
-        mask = all_enrollments > 500
-        filtered_values = all_enrollments[mask]
+    if np.any(mask_500):       
+        filtered_values = all_enrollments[mask_500]
         print(f"For all enrollments over 500, the median value was: {np.floor(np.median(filtered_values)).astype(int)}")
     else:
         print("No enrollments over 500.")
 
- 
-    # Mean enrollment for Grade 10 across all years
-    # * Mean enrollment for Grade 11 across all years
-    # * Mean enrollment for Grade 12 across all years
-    # * Highest enrollment for a single grade within the entire time period
-    # * Lowest enrollment for a single grade within the entire time period
-    # * Total enrollment for each year from 2013 to 2022
-	# * Total ten year enrollment
-	# * Mean total yearly enrollment over 10 years
-    # * Education planners want to better understand the impact of large-scale classes in high schools. Determine if any enrollment numbers were over 500. If not, print “No enrollments over 500.” If yes, print the median value of the >500 enrollments.
-
     # Print Stage 3 requirements here
     print("\n***General Statistics for All Schools***\n")
+
+    print(f"Mean enrollment in 2013: {np.floor(np.mean(enrollment_data_array[0, :, :])).astype(int)}")
+
+    enrollments_in_2022_zeroes = enrollment_data_array[9, :, :]  
+    mask_zeroes = (enrollments_in_2022_zeroes == 0)
+    enrollments_in_2022 = enrollments_in_2022_zeroes[~mask_zeroes]
+    print(f"Mean enrollment in 2022: {np.floor(np.mean(enrollments_in_2022)).astype(int)}")
+    
+    grade_12_enrollments_in_2022 = enrollment_data_array[9, :, 2]
+    print(f"Total graduating class of 2022: {np.floor(np.sum(grade_12_enrollments_in_2022)).astype(int)}")
+
+    grade_10_enrollments = enrollment_data_array[:, :, 0]
+    grade_11_enrollments = enrollment_data_array[:, :, 1]
+    grade_12_enrollments = enrollment_data_array[:, :, 2]
+
+    highest_enrollment = max(np.max(grade_10_enrollments), np.max(grade_11_enrollments), np.max(grade_12_enrollments))
+    print(f"Highest enrollment for a single grade: {np.floor(highest_enrollment).astype(int)}")
+    
+    lowest_enrollment = min(np.min(grade_10_enrollments), np.min(grade_11_enrollments), np.min(grade_12_enrollments))
+    print(f"Lowest enrollment for a single grade: {np.floor(lowest_enrollment).astype(int)}")
 
 
 if __name__ == '__main__':
