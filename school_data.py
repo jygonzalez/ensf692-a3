@@ -6,6 +6,13 @@
 # You may import any modules from the standard Python library.
 # Remember to include docstrings and comments.
 
+# TODO: Complete the following:
+# Commenting and Syntax (5 marks):
+# • (3) Comments must be included throughout the code to explain the functionality
+# • (2) All classes, methods, and functions are fully documented using docstrings
+# (including summary, parameters, and return values)
+
+
 
 import numpy as np
 from given_data import year_2013, year_2014, year_2015, year_2016, year_2017, year_2018, year_2019, year_2020, year_2021, year_2022
@@ -145,7 +152,6 @@ def main():
     filtered_yearly_totals = [value for value in yearly_totals if value != 0]
     print(f"Mean total enrollment over {len(yearly_totals)} years: {np.floor(np.mean(filtered_yearly_totals)).astype(int)}")
 
-    # TODO: ask if i should exclude values equal to zero from the median calculation here
     all_enrollments = school.enrollments(enrollment_data_array) 
     mask = all_enrollments > 500
     # Check if any values are greater than 500
@@ -158,7 +164,9 @@ def main():
     # Print Stage 3 requirements here
     print("\n***General Statistics for All Schools***\n")
 
-    print(f"Mean enrollment in 2013: {np.floor(np.mean(enrollment_data_array[0, :, :])).astype(int)}")
+    # TODO: Ask if I should mask zero values here even if I know that there are no zero values in year 2013
+    enrollments_in_2013 = enrollment_data_array[0, :, :]
+    print(f"Mean enrollment in 2013: {np.floor(np.mean(enrollments_in_2013)).astype(int)}")
 
     enrollments_in_2022 = enrollment_data_array[9, :, :] 
     print(f"Mean enrollment in 2022: {np.floor(np.mean(mask_zeroes(enrollments_in_2022))).astype(int)}")
