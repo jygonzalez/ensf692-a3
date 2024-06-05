@@ -93,16 +93,6 @@ class School:
     """
 
     def __init__(self, name, code):
-        """
-        Initialize the School object.
-
-        Parameters
-        ----------
-        name : str
-            School name.
-        code : str
-            School code.
-        """
         self.name = name
         self.code = code
         # Assign index for accessing the data array representing the school
